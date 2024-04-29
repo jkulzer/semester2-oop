@@ -2,6 +2,7 @@ package chat;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
@@ -28,8 +29,12 @@ public class Client {
 			try {
 				verbindung = Chat.verbindungAufbauen(serveradresse, Server.ANMELDEPORT);
 				connectionFailed = false;
-			} catch (Exception e) {
+			} catch (UnknownHostException unknownHostException) {
 				System.out.println("Failed to connect to the server, enter a correct address");
+				connectionFailed = true;
+				verbindung = null;
+			} catch (IOException ioException) {
+				System.out.println("Generic I/O exception");
 				connectionFailed = true;
 				verbindung = null;
 			}

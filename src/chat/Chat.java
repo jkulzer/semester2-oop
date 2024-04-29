@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
 * Client für einen ganz einfachen Chat
@@ -22,7 +23,7 @@ public class Chat {
 	* @param port die Portnummer des Servers
 	* @return das Verbindungsobjekt zum Server
 	*/
-	public static Socket verbindungAufbauen(String ip, int port) throws IOException {
+	public static Socket verbindungAufbauen(String ip, int port) throws IOException, UnknownHostException {
 		InetAddress ipAdresse;
 		Socket so = null;
 		try {
