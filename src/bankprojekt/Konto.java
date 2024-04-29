@@ -1,7 +1,9 @@
 package bankprojekt;
 
 import bankrechnereien.IbanMain;
-import bankprojekt.exceptions.*;
+import bankprojekt.exceptions.GesperrtException;
+
+import java.text.NumberFormat;
 
 /**
  * Diese Klasse stellt ein Bankkonto dar
@@ -20,11 +22,18 @@ public class Konto {
 	 * true, wenn das Konto gesperrt ist. Abhebungen und sonstige
 	 * Aktionen zum Schaden des Besitzers sind dann nicht möglich
 	 */
-	private boolean gesperrt;
+	private Boolean gesperrt;
 	/**
 	 * Der Kontoinhaber
 	 */
 	private Kunde inhaber;
+
+	/**
+	 * The Zweitinhaber
+	 */
+	private Kunde secondInhaber;
+
+	private static int numberOfKontosCreatedUntilNow = 0;
 	
 	/**
 	 * der auf zwei Stellen nach dem Komma gerundete Kontostand
@@ -84,6 +93,7 @@ public class Konto {
 	public Konto()
 	{
 		this(Kunde.MUSTERMANN, 0.0);
+		numberOfKontosCreatedUntilNow++;
 	}
 	/**
 	 * erstellt ein Konto mit dem angegebenen Kontostand, das
@@ -97,7 +107,8 @@ public class Konto {
 	{
 		//alle Attribute mit Startwerten versorgen:
 		this.kontostand = Math.max(0.0, anfangsstand);
-		this.nummer = 12345;
+		numberOfKontosCreatedUntilNow++;
+		this.nummer = numberOfKontosCreatedUntilNow;
 		this.gesperrt = false;
 		if(inhaber == null)
 			throw new IllegalArgumentException("null als Inhaber nicht erlaubt");
@@ -138,13 +149,13 @@ public class Konto {
 	 * @throws GesperrtException wenn das Konto gesperrt ist
 	 * @throws IllegalArgumentException wenn betrag Quatsch ist
 	 */
-	public boolean abheben(double betrag) throws bankprojekt.GesperrtException
+	public boolean abheben(double betrag) throws GesperrtException
 	{
 		if(betrag < 0 || !Double.isFinite(betrag) 
 				|| Double.isNaN(betrag))
 			throw new IllegalArgumentException();
 		if(this.gesperrt)
-			throw new bankprojekt.GesperrtException();
+			throw new GesperrtException();
 		this.kontostand -= betrag;
 		return true;
 	}
@@ -159,4 +170,40 @@ public class Konto {
 		return IbanMain.iban(this.nummer, blz);
 	}
 
+	@Override
+	public String toString() {
+		String data;
+
+		data = "Name: " + this.inhaber.getVorname() + " " + this.inhaber.getNachname()+ "\nKontonummer: " + this.nummer + "\nKontostand: " + getKontostandFormatiert() + "\n" + this.getGesperrtText();
+		return data;
+	}
+
+	public String getKontostandFormatiert() {
+		NumberFormat formatter = NumberFormat.getCurrencyInstance();
+		return formatter.format(this.getKontostand());
+	}
+
+	public String getGesperrtText() {
+		if (this.gesperrt) {
+			return "GESPERRT";
+		} else {
+			return  "";
+		}
+	}
+
+	public void setSecondInhaber(Kunde secondInhaber) throws GesperrtException {
+		if (!this.gesperrt) {
+			this.secondInhaber = secondInhaber;
+		} else {
+			throw new GesperrtException();
+		}
+	}
+
+	public void removeSecondInhaber(Kunde secondInhaber) throws GesperrtException{
+		if (!this.gesperrt) {
+			this.secondInhaber = null;
+		} else {
+			throw new GesperrtException();
+		}
+	}
 }
