@@ -3,6 +3,7 @@ package bankprojekt;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import bankprojekt.exceptions.GesperrtException;
 import bankprojekt.exceptions.KontonummerNichtVorhandenException;
 import kommunikation.EinAusgabe;
 
@@ -25,8 +26,23 @@ public class EinfacheBank {
 		System.out.println("(4) sperren");
 		System.out.println("(5) entsperren");
 		System.out.println("(6) Kontoinformationen");
-		System.out.println("(7) Inhaberwechsel");
 		System.out.println("(0) beenden");
+	}
+
+
+	/**
+	 * Allows the user to select which type of Konto to create
+	 * @return the integer of the choice the user made
+	 */
+	private int getKontoSelection() {
+		int auswahl;
+
+		System.out.println("(1) Ein Girokonto erstellen");
+		System.out.println("(2) Ein Sparbuch erstellen");
+
+		auswahl = EinAusgabe.eingabeGanzzahl("Ihre Auswahl bitte: ");
+
+		return auswahl;
 	}
 	
 	/**
@@ -35,9 +51,26 @@ public class EinfacheBank {
 	 * @param wer der Kontoinhaber
 	 * @return Kontonummer des neuen Kontos, -1, wenn wer leer ist
 	 */
-	public long neuesKontoAnlegen(Kunde wer)
+	public long neuesKontoAnlegen(Kunde wer, int selection)
 	{
+		if(wer == null)
+			return -1;
 
+		switch(selection) {
+			case 1 -> {
+				Girokonto neu = new Girokonto(wer, 0, 0);
+				kontoEinfuegen(neu);
+				return neu.getNummer();
+			}
+			case 2 -> {
+				Sparbuch neu = new Sparbuch(0.1, wer);
+				kontoEinfuegen(neu);
+				return neu.getNummer();
+			}
+			default -> {
+				throw new IllegalArgumentException();
+			}
+		}
 	}
 	
 	/**
@@ -75,7 +108,8 @@ public class EinfacheBank {
 	 */
 	public void einzahlung(long nr, double betrag)throws KontonummerNichtVorhandenException
 	{
-		
+		Konto k = findeKontoZuNr(nr);
+		k.einzahlen(betrag);
 	}
 	
 	/**
@@ -83,10 +117,12 @@ public class EinfacheBank {
 	 * @param nr Kontonummer des gewünschten Girokontos
 	 * @param betrag abzuhebender Betrag
 	 * @throws KontonummerNichtVorhandenException wenn es die Nr in der Bank nicht gibt
+	 * @throws GesperrtException wenn das gewünschte Konto gesperrt ist
 	 * @return true, wenn die Abhebung durchgeführt werden konnte
 	 */
-	public boolean abhebung(long nr, double betrag)throws KontonummerNichtVorhandenException {
-		
+	public boolean abhebung(long nr, double betrag)throws KontonummerNichtVorhandenException, GesperrtException {
+		Konto k = findeKontoZuNr(nr);
+		return k.abheben(betrag);
 	}
 	
 	/**
@@ -96,7 +132,8 @@ public class EinfacheBank {
 	 * @throws KontonummerNichtVorhandenException wenn es die Nr in der Bank nicht gibt
 	 */
 	public void sperrenEntsperren(long nr, boolean sperren)throws KontonummerNichtVorhandenException {
-		
+		Konto k = findeKontoZuNr(nr);
+		k.setGesperrt(sperren);
 	}
 	
 	/**
@@ -109,17 +146,6 @@ public class EinfacheBank {
 			ausgabe += this.konten[i] + System.lineSeparator();
 		}
 		return ausgabe;	
-	}
-	
-	/**
-	 * Setzt den neuen Inhaber des gewünschten Kontos
-	 * @param nr Kontonummer des gewünschten Kontos
-	 * @param neuerInhaber der neue Inhaber dieses Kontos; wenn null angegeben wird, wird
-	 *                     kein Inhaberwechsel durchgeführt
-	 * @throws KontonummerNichtVorhandenException wenn es die Nr in der Bank nicht gibt
-	 */
-	public void inhaberwechsel(long nr, Kunde neuerInhaber)throws KontonummerNichtVorhandenException {
-		
 	}
 	
 	/**
@@ -144,7 +170,8 @@ public class EinfacheBank {
 					System.out.println("Ihr Nachname: ");
 					String nachname = tastatur.nextLine();
 					Kunde wer = new Kunde(vorname, nachname);
-					long nr = hwrBank.neuesKontoAnlegen(wer);
+					int selection = hwrBank.getKontoSelection();
+					long nr = hwrBank.neuesKontoAnlegen(wer, selection);
 					System.out.println("Ihre neue Kontonummer lautet: " + nr);
 				}
 				case 2 -> {
@@ -163,6 +190,8 @@ public class EinfacheBank {
 						if(!hwrBank.abhebung(nr, betrag)) {
 							System.out.println("Abhebung konnte nicht durchgeführt werden.");
 						}
+					} catch (GesperrtException e) {
+						System.out.println("Konto gesperrt!");
 					} catch (KontonummerNichtVorhandenException e) {
 						System.out.println("Diese Kontonummer gibt es nicht!");
 					}
@@ -176,20 +205,6 @@ public class EinfacheBank {
 					hwrBank.sperrenEntsperren(nr, false);
 				}
 				case 6 -> System.out.println(hwrBank.kontoinformationen());
-				case 7 -> {
-					long nr = EinAusgabe.eingabeGanzzahl("Ihre Kontonummer: ");
-					System.out.println("Vorname des neuen Inhabers: ");
-					String vorname = tastatur.nextLine();
-					System.out.println("Nachname des neuen Inhabers: ");
-					String nachname = tastatur.nextLine();
-					Kunde wer = new Kunde(vorname, nachname);
-					try {
-						hwrBank.inhaberwechsel(nr, wer);
-					} catch (KontonummerNichtVorhandenException e) {
-						System.out.println("Diese Kontonummer gibt es nicht!");
-					}
-					System.out.println(hwrBank.kontoinformationen());
-				}
 			}
 				
 		}while (auswahl != 0);

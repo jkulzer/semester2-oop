@@ -1,4 +1,9 @@
 package bankprojekt.exceptions;
 
-public class KontonummerNichtVorhandenException extends Throwable {
+/**
+ * tritt auf, wenn man versucht, in einer Bank auf ein nicht
+ * vorhandenes Konto zuzugreifen
+ */
+public class KontonummerNichtVorhandenException extends RuntimeException {
+
 }

@@ -26,15 +26,15 @@ public class Kontenspielerei {
 		System.out.println(customerThree);
 		System.out.println(customerFour);
 
-		Konto accountOne = new Konto(customerOne, 0);
-		Konto accountTwo = new Konto(customerTwo, 0);
-		Konto accountThree = new Konto(customerThree, 0);
-		Konto accountFour = new Konto(customerFour, 0);
+		// Konto accountOne = new Konto(customerOne, 0);
+		// Konto accountTwo = new Konto(customerTwo, 0);
+		// Konto accountThree = new Konto(customerThree, 0);
+		// Konto accountFour = new Konto(customerFour, 0);
 
-		System.out.println(accountOne);
-		System.out.println(accountTwo);
-		System.out.println(accountThree);
-		System.out.println(accountFour);
+		// System.out.println(accountOne);
+		// System.out.println(accountTwo);
+		// System.out.println(accountThree);
+		// System.out.println(accountFour);
 
 		// System.out.println(meins.getKontostand());
 		// meins.kontostand = 234567897654.0;

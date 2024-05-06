@@ -1,9 +1,9 @@
 package chat;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.net.Socket;
 
 /**
 * Client eines ganz einfachen Chats
@@ -20,6 +20,7 @@ public class Client {
 		Socket verbindung;
 		String text;
 		boolean connectionFailed;
+		String test;
 
 		connectionFailed = false;
 
@@ -33,7 +34,7 @@ public class Client {
 				System.out.println("Failed to connect to the server, enter a correct address");
 				connectionFailed = true;
 				verbindung = null;
-			} catch (IOException ioException) {
+			} catch (Exception ioException) {
 				System.out.println("Generic I/O exception");
 				connectionFailed = true;
 				verbindung = null;
@@ -55,7 +56,7 @@ public class Client {
 		} while (!text.equals("END"));
 		try {
 			verbindung.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("I/O error when closing socket");
 		}
 	}

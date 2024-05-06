@@ -1,7 +1,8 @@
 package bankprojekt.exceptions;
 
-/**
- * Tritt bei einem unerlaubten Zugriff auf ein gesperrtes Konto auf
+/** 
+ * wird geworfen, wenn eine nicht erlaubte Aktion auf einem gesperrten Konto
+ * ausgeführt wird
  */
 public class GesperrtException extends Exception {
 
