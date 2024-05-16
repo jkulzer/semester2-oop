@@ -8,7 +8,7 @@ import java.time.format.FormatStyle;
 /**
  * Kunde einer Bank
  */
-public class Kunde {
+public class Kunde implements Comparable<Kunde> {
 	/**
 	 * Ein Musterkunde
 	 */
@@ -74,7 +74,6 @@ public class Kunde {
 	 * @param nachname Nachname
 	 * @param adresse Adresse
 	 * @param gebdat Geburtstag im Format tt.mm.yyyy
-	 * @throws DateTimeParseException wenn das Format des übergebenen Datums nicht korrekt ist
 	 * @throws IllegalArgumentException wenn einer der Parameter null ist
 	 */
 	public Kunde(String vorname, String nachname, String adresse, String gebdat)  {
@@ -179,5 +178,10 @@ public class Kunde {
 		ausgabe += this.adresse + System.getProperty("line.separator");
 		ausgabe += df.format(this.geburtstag) +  "(" + this.getAlter() +")" + System.getProperty("line.separator");
 		return ausgabe;
+	}
+
+	@Override
+	public int compareTo(Kunde o) {
+		return this.nachname.compareTo(o.nachname);
 	}
 }
