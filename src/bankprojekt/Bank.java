@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Bank {
-    int bankleitzahl;
-    String ort;
+    private int bankleitzahl;
+    private String ort;
 
-    TreeMap<Long, Konto> accounts;
+    private TreeMap<Long, Konto> accounts;
 
     public Bank() {
         this.bankleitzahl = 0;
@@ -102,20 +102,27 @@ public class Bank {
         }
     }
 
-    public boolean geldUeberweisen(long numberFrom, long numberTo, double amount, String zweck) throws AccountNotFoundException, BetrugsversuchException, PoorCustomerException {
+    public boolean geldUeberweisen(long numberFrom, long numberTo, double amount, String zweck) throws AccountNotFoundException, BetrugsversuchException, PoorCustomerException , IllegalAccountType, GesperrtException {
         Konto accountFrom = this.accounts.get(numberFrom);
         Konto accountTo = this.accounts.get(numberTo);
 
         if (accountFrom != null && accountTo != null) {
-            if (amount <= 0) {
-                throw new BetrugsversuchException();
+            if (accountFrom.getClass() == Girokonto.class || accountTo.getClass() == Girokonto.class) {
+                Girokonto girokontoFrom = (Girokonto) this.accounts.get(numberFrom);
+                Girokonto girokontoTo = (Girokonto) this.accounts.get(numberTo);
+                if (amount <= 0) {
+                    throw new BetrugsversuchException();
+                }
+                if (girokontoFrom.getKontostand() < amount) {
+                    throw new PoorCustomerException();
+                }
+
+                girokontoTo.ueberweisungAbsenden(amount, "", numberTo, this.bankleitzahl , zweck);
+
+                return true;
+            } else {
+                throw new IllegalAccountType();
             }
-            if (accountFrom.getKontostand() < amount) {
-                throw new PoorCustomerException();
-            }
-            accountFrom.setKontostand(accountFrom.getKontostand() - amount);
-            accountTo.setKontostand(accountTo.getKontostand() + amount);
-            return true;
         } else {
             throw new AccountNotFoundException();
         }
